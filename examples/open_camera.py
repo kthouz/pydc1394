@@ -23,26 +23,31 @@
 from __future__ import (print_function, unicode_literals, division,
         absolute_import)
 
-from pydc1394 import Camera
+from pydc1394 import Camera, DC1394Library
 
 
 print("Opening camera!")
-cam0 = Camera()
+
+lib = DC1394Library()
+print lib.enumerate_cameras()
+cam_num = 0
+cam0 = Camera(lib = lib, guid = lib.enumerate_cameras()[cam_num]['guid'])
 
 print("Vendor:", cam0.vendor)
 print("Model:", cam0.model)
 print("GUID:", cam0.guid)
 print("Mode:", cam0.mode)
-print("Framerate: ", cam0.framerate.value)
+#print("Framerate: ", cam0.framerate.value) #Camera.framerate broken
 
 print("Acquiring one frame!")
-cam0.start_capture()
-cam0.start_one_shot()
-i = cam0.dequeue()
+
+cam0.start()
+i = cam0.shot()
+#i = cam0.dequeue()
 print("Shape:", i.shape)
 print("Dtype:", i.dtype)
-i.enqueue()
-cam0.stop_one_shot()
-cam0.stop_capture()
+#i.enqueue()
+#cam0.stop_one_shot()
+cam0.stop()
 
 print("All done!")
